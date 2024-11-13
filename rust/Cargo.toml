@@ -1,0 +1,13 @@
+[package]
+name = "frb_charming"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+anyhow = "1"
+charming = {version = "0.4.0",features = ["ssr"]} 
+flutter_rust_bridge = "=2.5.1"
+miniz_oxide = "=0.7.2"
