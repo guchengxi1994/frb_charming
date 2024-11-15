@@ -277,6 +277,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "chart_core"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "charming",
+]
+
+[[package]]
 name = "clang-sys"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -655,9 +663,8 @@ name = "frb_charming"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "charming",
+ "chart_core",
  "flutter_rust_bridge",
- "miniz_oxide 0.7.2",
 ]
 
 [[package]]
