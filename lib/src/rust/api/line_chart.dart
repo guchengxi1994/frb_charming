@@ -5,11 +5,82 @@
 
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+part 'line_chart.freezed.dart';
 
 Future<Uint8List?> newLineChart(
         {required String title, required LineChartData data}) =>
     RustLib.instance.api
         .crateApiLineChartNewLineChart(title: title, data: data);
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LineChartData>>
-abstract class LineChartData implements RustOpaqueInterface {}
+Future<Output> newLineChartWithConfig(
+        {required String title,
+        required LineChartData data,
+        required ChartOutputConfig config}) =>
+    RustLib.instance.api.crateApiLineChartNewLineChartWithConfig(
+        title: title, data: data, config: config);
+
+class ChartOutputConfig {
+  final (int, int) outputSize;
+  final OutputFormat outputFormat;
+  final String? outputPath;
+
+  const ChartOutputConfig({
+    required this.outputSize,
+    required this.outputFormat,
+    this.outputPath,
+  });
+
+  @override
+  int get hashCode =>
+      outputSize.hashCode ^ outputFormat.hashCode ^ outputPath.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChartOutputConfig &&
+          runtimeType == other.runtimeType &&
+          outputSize == other.outputSize &&
+          outputFormat == other.outputFormat &&
+          outputPath == other.outputPath;
+}
+
+class LineChartData {
+  final List<String> x;
+  final Float32List y;
+
+  const LineChartData({
+    required this.x,
+    required this.y,
+  });
+
+  @override
+  int get hashCode => x.hashCode ^ y.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LineChartData &&
+          runtimeType == other.runtimeType &&
+          x == other.x &&
+          y == other.y;
+}
+
+@freezed
+sealed class Output with _$Output {
+  const Output._();
+
+  const factory Output.file(
+    String field0,
+  ) = Output_File;
+  const factory Output.memory(
+    Uint8List field0,
+  ) = Output_Memory;
+  const factory Output.none() = Output_None;
+}
+
+enum OutputFormat {
+  png,
+  svg,
+  ;
+}
