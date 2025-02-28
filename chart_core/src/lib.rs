@@ -2,12 +2,18 @@ pub mod charts;
 pub mod config;
 
 use charming::ImageRenderer;
+use charts::{
+    bar_chart::{BarChart, BarChartData},
+    graph_chart::{GraphChart, GraphChartData},
+    line_chart::LineChart,
+    ChartData,
+};
 pub use config::Output;
 
 use crate::charts::{line_chart::LineChartData, BaseChartTrait};
 
 pub fn new_line_chart(title: String, data: LineChartData) -> Option<Vec<u8>> {
-    let r = compose(title, data, None, None, None);
+    let r = compose("line".to_owned(), title, data, None, None, None);
     match r {
         Ok(_r) => {
             return Some(_r);
@@ -25,6 +31,7 @@ pub fn new_line_chart_with_config(
     config: config::ChartOutputConfig,
 ) -> Output {
     let r = compose(
+        "line".to_owned(),
         title,
         data,
         Some(config.output_size.0),
@@ -55,16 +62,46 @@ pub fn new_line_chart_with_config(
     }
 }
 
-fn compose(
+fn compose<T: ChartData>(
+    chart_type: String,
     title: String,
-    data: LineChartData,
+    data: T,
     width: Option<u32>,
     height: Option<u32>,
     format: Option<config::OutputFormat>,
 ) -> anyhow::Result<Vec<u8>> {
-    let mut chart = charts::line_chart::LineChart::default();
-    chart.data = data;
-    chart.title = title;
+    let mut chart: Box<dyn BaseChartTrait> = match chart_type.as_str() {
+        "line" => {
+            let mut line_chart = LineChart::default();
+            if let Some(d) = data.as_chart_data().downcast_ref::<LineChartData>() {
+                line_chart.data = d.clone();
+            } else {
+                return Err(anyhow::anyhow!("Invalid data type for line chart"));
+            }
+            Box::new(line_chart)
+        }
+        "bar" => {
+            let mut bar_chart = BarChart::default();
+            if let Some(d) = data.as_chart_data().downcast_ref::<BarChartData>() {
+                bar_chart.data = d.clone();
+            } else {
+                return Err(anyhow::anyhow!("Invalid data type for bar chart"));
+            }
+            Box::new(bar_chart)
+        }
+        "graph" => {
+            let mut graph_chart = GraphChart::default();
+            if let Some(d) = data.as_chart_data().downcast_ref::<GraphChartData>() {
+                graph_chart.data = d.clone();
+            } else {
+                return Err(anyhow::anyhow!("Invalid data type for graph chart"));
+            }
+            Box::new(graph_chart)
+        }
+        _ => return Err(anyhow::anyhow!("Chart type not supported")),
+    };
+
+    chart.set_title(title);
     let c = chart.compose();
     let mut renderer = ImageRenderer::new(width.unwrap_or(1000), height.unwrap_or(800));
     let r;

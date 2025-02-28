@@ -1,44 +1,44 @@
 use charming::{
     component::{Axis, Title},
     element::AxisType,
-    series::Line,
+    series::Bar,
     Chart,
 };
 
 use super::{BaseChart, BaseChartTrait, ChartData};
 
+pub struct BarChart {
+    pub base: BaseChart,
+    pub data: BarChartData,
+    pub title: String,
+}
+
 #[derive(Debug, Clone)]
-pub struct LineChartData {
+pub struct BarChartData {
     pub x: Vec<String>,
     pub y: Vec<f32>,
 }
 
-impl LineChartData {
-    pub fn new() -> LineChartData {
-        LineChartData {
+impl BarChartData {
+    pub fn new() -> BarChartData {
+        BarChartData {
             x: vec![],
             y: vec![],
         }
     }
 }
 
-impl ChartData for LineChartData {
+impl ChartData for BarChartData {
     fn as_chart_data(&self) -> Box<dyn std::any::Any> {
         Box::new(self.clone())
     }
 }
 
-pub struct LineChart {
-    pub base: BaseChart,
-    pub data: LineChartData,
-    pub title: String,
-}
-
-impl BaseChartTrait for LineChart {
+impl BaseChartTrait for BarChart {
     fn default() -> Self {
-        LineChart {
+        BarChart {
             base: BaseChart::new().set_type("line".to_string()),
-            data: LineChartData::new(),
+            data: BarChartData::new(),
             title: "".to_string(),
         }
     }
@@ -53,6 +53,6 @@ impl BaseChartTrait for LineChart {
             .title(Title::new().text(&self.title))
             .x_axis(Axis::new().data(self.data.x.clone()))
             .y_axis(Axis::new().type_(AxisType::Value))
-            .series(Line::new().data(self.data.y.clone()));
+            .series(Bar::new().data(self.data.y.clone()));
     }
 }
