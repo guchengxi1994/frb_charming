@@ -12,57 +12,7 @@ pub use config::Output;
 
 use crate::charts::{line_chart::LineChartData, BaseChartTrait};
 
-pub fn new_line_chart(title: String, data: LineChartData) -> Option<Vec<u8>> {
-    let r = compose("line".to_owned(), title, data, None, None, None);
-    match r {
-        Ok(_r) => {
-            return Some(_r);
-        }
-        Err(_e) => {
-            println!("render Line chart Error: {:?}", _e);
-            return None;
-        }
-    }
-}
-
-pub fn new_line_chart_with_config(
-    title: String,
-    data: LineChartData,
-    config: config::ChartOutputConfig,
-) -> Output {
-    let r = compose(
-        "line".to_owned(),
-        title,
-        data,
-        Some(config.output_size.0),
-        Some(config.output_size.1),
-        Some(config.output_format),
-    );
-    match r {
-        Ok(_r) => {
-            if let Some(path) = &config.output_path {
-                let s = std::fs::write(path, _r);
-                match s {
-                    Ok(_) => {
-                        return Output::File(path.to_string());
-                    }
-                    Err(_e) => {
-                        println!("write file error: {:?}", _e);
-                        return Output::None;
-                    }
-                }
-            }
-
-            return Output::Memory(_r);
-        }
-        Err(_e) => {
-            println!("render Line chart Error: {:?}", _e);
-            return Output::None;
-        }
-    }
-}
-
-fn compose<T: ChartData>(
+pub fn compose<T: ChartData>(
     chart_type: String,
     title: String,
     data: T,
