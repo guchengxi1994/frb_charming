@@ -1,4 +1,7 @@
+pub mod bar_chart;
+pub mod graph_chart;
 pub mod line_chart;
+mod tests;
 
 use charming::{
     element::{CoordinateSystem, ItemStyle, Label},
@@ -64,7 +67,15 @@ impl BaseChart {
 }
 
 pub trait BaseChartTrait {
-    fn default() -> Self;
+    fn default() -> Self
+    where
+        Self: Sized;
 
     fn compose(&self) -> Chart;
+
+    fn set_title(&mut self, title: String);
+}
+
+pub trait ChartData {
+    fn as_chart_data(&self) -> Box<dyn std::any::Any>;
 }
