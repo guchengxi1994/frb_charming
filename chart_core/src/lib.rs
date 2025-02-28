@@ -4,7 +4,7 @@ pub mod config;
 use charming::ImageRenderer;
 use charts::{
     bar_chart::{BarChart, BarChartData},
-    graph_chart::{GraphChart, GraphChartData},
+    graph_chart::{GraphChart, GraphChartData, MindGraphChart},
     line_chart::LineChart,
     ChartData,
 };
@@ -47,6 +47,15 @@ pub fn compose<T: ChartData>(
                 return Err(anyhow::anyhow!("Invalid data type for graph chart"));
             }
             Box::new(graph_chart)
+        }
+        "mind_graph" => {
+            let mut mind_graph_chart = MindGraphChart::default();
+            if let Some(d) = data.as_chart_data().downcast_ref::<GraphChartData>() {
+                mind_graph_chart.data = d.clone();
+            } else {
+                return Err(anyhow::anyhow!("Invalid data type for mind graph chart"));
+            }
+            Box::new(mind_graph_chart)
         }
         _ => return Err(anyhow::anyhow!("Chart type not supported")),
     };
