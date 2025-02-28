@@ -37,7 +37,7 @@ impl ChartData for BarChartData {
 impl BaseChartTrait for BarChart {
     fn default() -> Self {
         BarChart {
-            base: BaseChart::new().set_type("line".to_string()),
+            base: BaseChart::new().set_type("bar".to_string()),
             data: BarChartData::new(),
             title: "".to_string(),
         }

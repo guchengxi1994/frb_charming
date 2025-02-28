@@ -12,6 +12,12 @@ pub struct GraphChart {
     pub title: String,
 }
 
+pub struct MindGraphChart {
+    pub base: super::BaseChart,
+    pub data: GraphChartData,
+    pub title: String,
+}
+
 #[derive(Debug, Clone)]
 pub struct GraphChartData {
     pub data: String,
@@ -29,7 +35,7 @@ impl BaseChartTrait for GraphChart {
         Self: Sized,
     {
         GraphChart {
-            base: super::BaseChart::new().set_type("line".to_string()),
+            base: super::BaseChart::new().set_type("graph".to_string()),
             data: GraphChartData {
                 data: "".to_string(),
             },
@@ -59,6 +65,51 @@ impl BaseChartTrait for GraphChart {
                     .label_layout(LabelLayout::new().hide_overlap(true))
                     .scale_limit(ScaleLimit::new().min(0.4).max(2.0))
                     .line_style(LineStyle::new().color("source").curveness(0.3))
+                    .data(data),
+            )
+    }
+
+    fn set_title(&mut self, title: String) {
+        self.title = title;
+    }
+}
+
+impl BaseChartTrait for MindGraphChart {
+    fn default() -> Self
+    where
+        Self: Sized,
+    {
+        MindGraphChart {
+            base: super::BaseChart::new().set_type("graph".to_string()),
+            data: GraphChartData {
+                data: "".to_string(),
+            },
+            title: "".to_string(),
+        }
+    }
+
+    fn compose(&self) -> charming::Chart {
+        let data: GraphData = serde_json::from_str(&self.data.data).unwrap_or(GraphData {
+            nodes: vec![],
+            links: vec![],
+            categories: vec![],
+        });
+        charming::Chart::new()
+            .legend(Legend::new().data(data.categories.iter().map(|c| c.name.clone()).collect()))
+            .series(
+                Graph::new()
+                    .name(self.title.clone())
+                    .layout(GraphLayout::None)
+                    .roam(true)
+                    .label(
+                        Label::new()
+                            .show(true)
+                            .position(LabelPosition::Right)
+                            .formatter("{b}"),
+                    )
+                    .label_layout(LabelLayout::new().hide_overlap(true))
+                    .scale_limit(ScaleLimit::new().min(0.4).max(2.0))
+                    .line_style(LineStyle::new().color("source").curveness(0))
                     .data(data),
             )
     }
